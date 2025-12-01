@@ -66,3 +66,88 @@ window.addEventListener('scroll', () => {
         accueilSection.style.transform = `translateY(${scrollY * 0.5}px)`;
     }
 });
+
+// Charger les images de la galerie dynamiquement
+async function loadGalleryImages() {
+    const galerieContainer = document.getElementById('galerie');
+    
+    if (!galerieContainer) return;
+    
+    try {
+        // Récupérer la liste des fichiers du dossier style/Images
+        const response = await fetch('style/Images');
+        const html = await response.text();
+        
+        // Parser le HTML pour récupérer les noms des fichiers
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const links = doc.querySelectorAll('a');
+        
+        // Extraire les noms de fichiers image
+        const imageFiles = [];
+        links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && /\.(jpg|jpeg|png|gif|webp)$/i.test(href)) {
+                imageFiles.push(href);
+            }
+        });
+        
+        // Limiter à 5 images (les plus récentes)
+        const maxImages = 5;
+        const imagesToDisplay = imageFiles.slice(-maxImages);
+        
+        // Afficher les images
+        galerieContainer.innerHTML = '';
+        imagesToDisplay.forEach(file => {
+            const div = document.createElement('div');
+            div.className = 'gallery-item';
+            
+            const img = document.createElement('img');
+            img.src = 'style/Images/' + file;
+            img.alt = file;
+            img.loading = 'lazy';
+            
+            div.appendChild(img);
+            galerieContainer.appendChild(div);
+        });
+        
+        console.log(`${imagesToDisplay.length} images chargées dans la galerie`);
+        
+    } catch (error) {
+        // Fallback: charger les images directement s'il y a une erreur CORS
+        console.log('Utilisation de la méthode alternative pour charger les images');
+        loadGalleryImagesAlternative();
+    }
+}
+
+// Méthode alternative si fetch échoue (utilise une liste de fichiers)
+function loadGalleryImagesAlternative() {
+    const galerieContainer = document.getElementById('galerie');
+    
+    if (!galerieContainer) return;
+    
+    // Vous devez créer un fichier images.json ou spécifier manuellement les images
+    const images = [
+        // Ajouter vos images ici: 'image1.jpg', 'image2.png', etc.
+    ];
+    
+    const maxImages = 5;
+    const imagesToDisplay = images.slice(-maxImages);
+    
+    galerieContainer.innerHTML = '';
+    imagesToDisplay.forEach(file => {
+        const div = document.createElement('div');
+        div.className = 'gallery-item';
+        
+        const img = document.createElement('img');
+        img.src = 'style/Images/' + file;
+        img.alt = file;
+        img.loading = 'lazy';
+        
+        div.appendChild(img);
+        galerieContainer.appendChild(div);
+    });
+}
+
+// Charger les images quand la page est prête
+document.addEventListener('DOMContentLoaded', loadGalleryImages);
