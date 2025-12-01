@@ -60,7 +60,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Effet de parallaxe au scroll
 window.addEventListener('scroll', () => {
-    const accueilSection = document.querySelector('.Accueil');
+    const accueilSection = document.querySelector('.titre');
     if (accueilSection) {
         const scrollY = window.scrollY;
         accueilSection.style.transform = `translateY(${scrollY * 0.5}px)`;
